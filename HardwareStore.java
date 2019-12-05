@@ -49,21 +49,11 @@ import java.lang.Runtime;
 public class HardwareStore extends JFrame
         implements ActionListener {
 
-    private JButton updateRecordButton,
-            addNewRecordButton,
-            deleteRecordButton,
-            listAllButton,
-            quitProgram;
-
    private PassWord passwordCheckingDialogBox;
    private UpdateRec updateRecordDialogBox;
-   private NewRec    newRecordDialogBox;
-   private DeleteRec deleteRecordDialogBox;
+   private DeleteRecord deleteRecordDialogBox;
    private Record data;
    private String pData[] []  = new String [ 250 ] [ 7 ];
-   private JMenuBar menuBar ;
-   private JMenu fileMenu, viewMenu, optionsMenu, toolsMenu,
-           helpMenu, aboutMenu ;
    /** File Menu Items */
    private JMenuItem eMI ;
    /** View Menu Items */
@@ -449,13 +439,13 @@ public class HardwareStore extends JFrame
      ********************************************************/
     public void setupMenu() {
         /** Create the menubar */
-        menuBar = new JMenuBar();
+        JMenuBar menuBar = new JMenuBar();
 
         /** Add the menubar to the frame */
         setJMenuBar(menuBar);
 
         /** Create the File menu and add it to the menubar  */
-        fileMenu = new JMenu("File");
+        JMenu fileMenu = new JMenu("File");
 
         menuBar.add(fileMenu);
         /** Add the Exit menuitems */
@@ -464,7 +454,7 @@ public class HardwareStore extends JFrame
         eMI.addActionListener(menuHandler);
 
         /** Create the View menu and add it to the menubar  */
-        viewMenu = new JMenu("View");
+        JMenu viewMenu = new JMenu("View");
 
         /** Add the Lawn Mower menuitems */
         lmMI = new JMenuItem("Lawn Mowers");
@@ -529,7 +519,7 @@ public class HardwareStore extends JFrame
 
         menuBar.add(viewMenu);
         /** Create the Options menu and add it to the menubar  */
-        optionsMenu = new JMenu("Options");
+        JMenu optionsMenu = new JMenu("Options");
 
         /** Add the List All menuitems */
         listAllMI = new JMenuItem("List All");
@@ -556,7 +546,7 @@ public class HardwareStore extends JFrame
         menuBar.add(optionsMenu);
 
         /** Create the Tools menu and add it to the menubar  */
-        toolsMenu = new JMenu("Tools");
+        JMenu toolsMenu = new JMenu("Tools");
         menuBar.add(toolsMenu);
         /** Add the Tools menuitems */
         debugON = new JMenuItem("Debug On");
@@ -567,7 +557,7 @@ public class HardwareStore extends JFrame
         debugOFF.addActionListener(menuHandler);
 
         /** Create the Help menu and add it to the menubar  */
-        helpMenu = new JMenu("Help");
+        JMenu helpMenu = new JMenu("Help");
 
         /** Add the Help HW Store menuitems */
         helpHWMI = new JMenuItem("Help on HW Store");
@@ -577,7 +567,7 @@ public class HardwareStore extends JFrame
         menuBar.add(helpMenu);
 
         /** Create the About menu and add it to the menubar  */
-        aboutMenu = new JMenu("About");
+        JMenu aboutMenu = new JMenu("About");
 
         /** Add the About Store menuitems */
         aboutHWMI = new JMenuItem("About HW Store");
@@ -596,8 +586,6 @@ public class HardwareStore extends JFrame
      * Called by the HardwareStore() constructor
      ********************************************************/
     public void setup() {
-        double loopLimit = 0.0;
-        int ii = 0, iii = 0;
         data = new Record();
 
         try {
@@ -612,8 +600,7 @@ public class HardwareStore extends JFrame
             numEntries = toArray(file, pData);
 
             file.close();
-        } catch (IOException ex) {
-            //part.setText( "Error reading file" );
+        } catch (IOException ignored) {
         }
 
         /** ****************************************************************
@@ -635,8 +622,7 @@ public class HardwareStore extends JFrame
         /** Make the Frame visiable */
         cancel = new JButton("Cancel");
         refresh = new JButton("Refresh");
-        buttonPanel = new JPanel();
-        //buttonPanel.add( refresh ) ;
+        JPanel buttonPanel = new JPanel();
         buttonPanel.add(cancel);
         c.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -645,7 +631,7 @@ public class HardwareStore extends JFrame
 
       /** Create dialog boxes */
       updateRecordDialogBox = new UpdateRec( hws, file, pData , -1);
-      deleteRecordDialogBox = new DeleteRec( hws, file, table, pData );
+      deleteRecordDialogBox = new DeleteRecord( hws, file, table, pData );
       /** Allocate pWord last; otherwise  the update,
        *  newRec and deleteRec references will be null
        *  when the PassWrod class attempts to use them.*/
@@ -897,7 +883,7 @@ public class HardwareStore extends JFrame
     ******************************************************************/
    public void displayAddDialog() {
       sysPrint ("The New/Add Record Dialog was made visible.\n") ;
-      newRecordDialogBox = new NewRec( hws, file, table, pData );
+      NewRecord newRecordDialogBox = new NewRecord( hws, file, table, pData );
       newRecordDialogBox.setVisible( true );
    }
 
@@ -1093,7 +1079,7 @@ public class HardwareStore extends JFrame
             sysPrint ("The Delete Record Dialog was made visible.\n") ;
             //DeleteRec( HardwareStore hw_store,  RandomAccessFile f,
                   // JTable tab, String p_Data[] []  )
-            deleteRecordDialogBox = new DeleteRec( hws, file, table, pData );
+            deleteRecordDialogBox = new DeleteRecord( hws, file, table, pData );
             deleteRecordDialogBox.setVisible( true );
          }
          else if ( e.getSource() == addMI ) {
@@ -1459,403 +1445,6 @@ public class HardwareStore extends JFrame
          quantity.setText( "" );
          price.setText( "" );
          setVisible( false );
-      }
-   }
-
-   /** ********************************************************
-    * class NewRec is used to gather and insert data for new
-    * hardware item records.
-    ********************************************************/
-   public class NewRec extends Dialog  implements ActionListener {
-
-      private RandomAccessFile file;
-      private JTextField recID, toolType, brandName, toolDesc,
-                partNum, quantity, price;
-      private JLabel recIDLabel,  toolTypeLabel, brandNameLabel,
-                  toolDescLabel,  partNumLabel, quantityLabel,
-                    priceLabel;
-      private JButton cancel, save;
-      private Record data;
-      private int theRecID, toCont, fileLen;
-      private JTable table ;
-      private String pData[] [] ;
-      private String columnNames[] = {"Record ID", "Type of tool",
-          "Brand Name",  "Tool Description", "partNum",
-          "Quantity", "Price"} ;
-      private HardwareStore hwStore ;
-      private boolean found = true ;
-
-      /** ********************************************************
-       * Method: NewRec() is the constructor that is used to
-       * initialized/create the
-       * 1- Labels
-       * 2- Textfields
-       * 3- buttons
-       * for this class.
-       ********************************************************/
-      public NewRec( HardwareStore hw_store, RandomAccessFile
-                     f, JTable tab,  String p_Data[] []  )  {
-
-         super( new Frame(), "New Record", true );
-
-         file = f;
-         table = tab ;
-         pData = p_Data ;
-         hwStore = hw_store ;
-
-         newSetup() ;
-      }
-
-      /** ********************************************************
-       * Method: setup() does the actual label, textfield, button
-       * setup and declares the layout manager that is used. It
-       * 1- sets the size of the dialog
-       * 2- creates the text fields
-       * 3- creates the labels
-       * 4- creates the buttons
-       * 5- adds the fields, labels, and buttons to the dialog
-       *    context.
-       ********************************************************/
-      public void newSetup() {
-         setSize( 400, 250 );
-         setLayout( new GridLayout( 9, 2 ) );
-
-         recID      = new JTextField( 10 );
-         recID.setEnabled( false );
-         try {
-            file = new RandomAccessFile( hwStore.aFile , "rw" ) ;
-            file.seek( 0 );
-            fileLen = (int)file.length() / data.getSize() ;
-            recID.setText( "" + fileLen ) ;
-         }
-         catch ( IOException ex ) {
-           partNum.setText( "Error reading file" );
-         }
-         toolType   = new JTextField( 10 );
-         brandName  = new JTextField( 10 );
-         toolDesc   = new JTextField( 10 );
-         partNum    = new JTextField( 10 );
-         quantity   = new JTextField( 10 );
-         price      = new JTextField( 10 );
-         recIDLabel     = new JLabel( "Record ID" );
-         toolTypeLabel  = new JLabel( "Type of Tool" );
-         brandNameLabel = new JLabel( "Brand Name" );
-         toolDescLabel  = new JLabel( "Tool Description" );
-         partNumLabel   = new JLabel( "Part Number" );
-         quantityLabel  = new JLabel( "Quantity" );
-         priceLabel     = new JLabel( "Price" );
-         save = new JButton( "Save Changes" );
-         cancel = new JButton( "Cancel" );
-
-         recID.addActionListener( this );
-         save.addActionListener( this );
-         cancel.addActionListener( this );
-
-         add( recIDLabel );
-         add( recID );
-         add( toolTypeLabel );
-         add( toolType );
-         add( brandNameLabel );
-         add( brandName );
-         add( toolDescLabel );
-         add( toolDesc );
-         add( partNumLabel );
-         add( partNum );
-         add( quantityLabel );
-         add( quantity );
-         add( priceLabel );
-         add( price );
-         add( save );
-         add( cancel );
-
-         data = new Record();
-         JOptionPane.showMessageDialog(null,
-                    "The recID field is currently set to the next record ID.\n" +
-                    "Please just fill in the " +
-                    "remaining fields.",
-                    "RecID To Be Entered",
-                    JOptionPane.INFORMATION_MESSAGE) ;
-
-      }
-
-      /** ************************************************************
-       * Method: actionPerformed() is the event handler that reesponds
-       *         to the GUI events generated by the NewRecord dialog.
-       ***************************************************************/
-      public void actionPerformed( ActionEvent e )   {
-         try {
-            file = new RandomAccessFile( hwStore.aFile , "rw" ) ;
-            file.seek( 0 );
-            fileLen = (int)file.length() / data.getSize() ;
-            recID.setText( "" + fileLen ) ;
-         }
-         catch ( IOException ex ) {
-           partNum.setText( "Error reading file" );
-         }
-
-         if ( e.getSource() == recID ) {
-            recID.setEnabled( false );
-         }
-         else if ( e.getSource() == save ) {
-            if ( recID.getText().equals("") ) {
-               /*JOptionPane.showMessageDialog(null,
-                    "A recID entered was:  null or blank, which is invalid.\n" +
-                    "Please enter a number greater than 0 and less than 251.", "RecID Entered",
-                    JOptionPane.INFORMATION_MESSAGE) ;
-               return ; */
-            }
-            else {
-               try {
-                  data.setRecID( Integer.parseInt( recID.getText() ) );
-                  data.setToolType( toolType.getText().trim() );
-                  data.setBrandName( brandName.getText().trim() );
-                  data.setToolDesc( toolDesc.getText().trim() );
-                  data.setPartNumber( partNum.getText().trim() );
-                  data.setQuantity( Integer.parseInt( quantity.getText() ) );
-                  data.setCost(  price.getText().trim()  );
-                  file.seek( 0 ) ;
-                  file.seek( ( data.getRecID()) * data.getSize() );
-                  data.write( file );
-
-                  // Account for index starting at 0 and for the next slot
-                  theRecID =  hwStore.getEntries()  ;
-                  hwStore.sysPrint("NewRec 1: The numbers of entries is " + (theRecID - 1) ) ;
-
-                  hwStore.sysPrint("NewRec 2: A new record is being added at " +
-                     theRecID   );
-                  pData[ theRecID  ] [ 0 ] =  Integer.toString( data.getRecID() ) ;
-                  pData[ theRecID  ] [ 1 ] =  data.getToolType().trim() ;
-                  pData[ theRecID  ] [ 2 ] =  data.getBrandName().trim() ;
-                  pData[ theRecID  ] [ 3 ] =  data.getToolDesc().trim()  ;
-                  pData[ theRecID  ] [ 4 ] =  data.getPartNumber().trim() ;
-                  pData[ theRecID  ] [ 5 ] =  Integer.toString( data.getQuantity() ) ;
-                  pData[ theRecID  ] [ 6 ] =  data.getCost().trim()  ;
-                  table = new JTable( pData, columnNames );
-                  table.repaint();
-                  hwStore.setEntries( hwStore.getEntries() + 1 );
-               }
-               catch ( IOException ex ) {
-                  partNum.setText( "Error writing file" );
-                  return;
-               }  // End of try-catch block
-            }  // End of inner if
-
-            toCont = JOptionPane.showConfirmDialog(null,
-                   "Do you want to add another record? \nChoose one",
-                   "Choose one",
-                   JOptionPane.YES_NO_OPTION);
-
-            if ( toCont == JOptionPane.YES_OPTION  )  {
-               recID.setText( "" );
-               toolType.setText( ""  );
-               quantity.setText( ""  );
-               brandName.setText( ""  );
-               toolDesc.setText( ""  );
-               partNum.setText( ""  );
-               price.setText( ""  );
-            }
-            else {
-               newClear();
-            }
-         }
-         else if ( e.getSource() == cancel ) {
-            newClear();
-         }
-      }
-
-      /** ********************************************************
-       * Method: newClear() is used to cleanup and exit the NewRecord
-       *         dialog.
-       ********************************************************/
-      private void newClear()   {
-         partNum.setText( "" );
-         toolType.setText( "" );
-         quantity.setText( "" );
-         price.setText( "" );
-         setVisible( false );
-      }
-   }
-
-    /** ***************************************************************
-     * Class: DeleteRec is used to create the Delete Record dialog,
-     * which in turn, is used to to delete records from the specified
-     * table(s).
-     ******************************************************************/
-    public class DeleteRec extends Dialog
-            implements ActionListener {
-        private RandomAccessFile file;
-        private JTextField recID;
-        private JLabel recIDLabel;
-        private JButton cancel, delete;
-        private Record data;
-        private int partNum;
-        private int theRecID = -1, toCont;
-        private JTable table;
-        private String pData[][];
-        private HardwareStore hwStore;
-        private boolean found = false;
-
-        /** ********************************************************
-         * Method: DeleteRec() constructor is used to initialize the
-         * DeleteRec class/dialog.
-         ********************************************************/
-        public DeleteRec(HardwareStore hw_store, RandomAccessFile f,
-                         JTable tab, String p_Data[][]) {
-
-            super(new Frame(), "Delete Record", true);
-            setSize(400, 150);
-            setLayout(new GridLayout(2, 2));
-            file = f;
-            table = tab;
-            pData = p_Data;
-            hwStore = hw_store;
-            delSetup();
-        }
-
-        /** ********************************************************
-         * Method: delSetup() is used to create
-         * 1- Label Record text field
-         * 3- The Record ID button
-         * 4- The Cancel button
-         ********************************************************/
-        public void delSetup() {
-            recIDLabel = new JLabel("Record ID");
-            recID = new JTextField(10);
-            delete = new JButton("Delete Record");
-            cancel = new JButton("Cancel");
-
-            cancel.addActionListener(this);
-            delete.addActionListener(this);
-            recID.addActionListener(this);
-
-            add(recIDLabel);
-            add(recID);
-            add(delete);
-            add(cancel);
-
-            data = new Record();
-        }
-
-        /** ********************************************************
-         * Method: actionPerformed() is used to respond to the
-         * event emanating from the Delete Record dialog. They are:
-         * 1- Pressing the enter key with the cursor in the record ID
-         *    text field.
-         * 2- Pressing the Delete button.
-         * 3- Pressing the Cancel button.
-         ********************************************************/
-        public void actionPerformed(ActionEvent e) {
-            System.out.println("DeleteRec(): 1a - In the actionPerformed() method. ");
-            if (e.getSource() == recID) {
-                theRecID = Integer.parseInt(recID.getText());
-
-                if (theRecID < 0 || theRecID > 250) {
-                    recID.setText("Invalid part number");
-                    //return;
-                } else {
-
-                    try {
-                        file = new RandomAccessFile(hwStore.aFile, "rw");
-
-                        file.seek(theRecID * data.getSize());
-                        data.ReadRec(file);
-                        System.out.println("DeleteRec(): 1b - The record read is recid " +
-                                data.getRecID() + " " +
-                                data.getToolType() + " " +
-                                data.getBrandName() + " " +
-                                data.getToolDesc() + " " +
-                                data.getQuantity() + " " +
-                                data.getCost());
-                    } catch (IOException ex) {
-                        recID.setText("Error reading file");
-                    }
-
-                    // if ( data.getRecID() == 0 )
-                    // recID.setText( partNum + " does not exist" );
-                }
-            } else if (e.getSource() == delete) {
-                theRecID = Integer.parseInt(recID.getText());
-
-                for (int iii = 0; iii < pData.length; iii++) {
-                    if ((pData[iii][0]).equals("" + theRecID)) {
-                        theRecID = Integer.parseInt(pData[iii][0]);
-                        found = true;
-                        System.out.println("DeleteRec(): 2 - The record id was found is  "
-                                + pData[iii][0]);
-                        break;
-                    }
-                }
-
-                try {
-
-                    System.out.println("DeleteRec(): 3 - The data file is " + hwStore.aFile +
-                            "The record to be deleted is " + theRecID);
-                    file = new RandomAccessFile(hwStore.aFile, "rw");
-                    //theRecID =  Integer.parseInt( recID.getText() ) ;
-                    data.setRecID(theRecID);
-
-                    hwStore.setEntries(hwStore.getEntries() - 1);
-                    System.out.println("DeleteRec(): 4 - Go to the beginning of the file.");
-                    file.seek((0));
-                    file.seek((theRecID) * data.getSize());
-                    data.ReadRec(file);
-                    System.out.println("DeleteRec(): 5 - Go to the record " + theRecID + " to be deleted.");
-                    data.setRecID(-1);
-              /* data.setToolType(  " " ) ;
-               data.setBrandName(  " " )  ;
-               data.setToolDesc(   " " ) ;
-               data.setPartNumber(  " " )  ;
-               data.setQuantity(   0 ) ;
-               data.setCost(   " " )  ;  */
-                    System.out.println("DeleteRec(): 6 - Write the deleted file to the file.");
-                    file.seek((0));
-                    file.seek((theRecID) * data.getSize());
-                    data.writeInteger(file, -1);
-
-                    System.out.println("DeleteRec(): 7 - The number of entries is " +
-                            hwStore.getEntries());
-
-                    file.close();
-                } catch (IOException ex) {
-                    recID.setText("Error writing file");
-                    return;
-                }
-
-
-                toCont = JOptionPane.showConfirmDialog(null,
-                        "Do you want to delete another record? \nChoose one",
-                        "Select Yes or No",
-                        JOptionPane.YES_NO_OPTION);
-
-                if (toCont == JOptionPane.YES_OPTION) {
-                    recID.setText("");
-                } else {
-                    delClear();
-                }
-            } else if (e.getSource() == cancel) {
-                delClear();
-            }
-        }
-
-        /** ********************************************************
-         * Method: delClear() is used to close the delete record
-         * dialog.
-         ********************************************************/
-        private void delClear() {
-            try {
-                System.out.println("DeleteRec(): 3 - The data file is " + hwStore.aFile +
-                        "The record to be deleted is " + theRecID);
-                file = new RandomAccessFile(hwStore.aFile, "rw");
-
-            Redisplay(  file, pData ) ;
-            file.close() ;
-         }
-         catch ( IOException ex ) {
-            recID.setText( "Error writing file" );
-            return;
-         }
-         setVisible( false );
-         recID.setText( "" );
       }
    }
 }
