@@ -42,7 +42,7 @@ Double clicking on an item on the main frame will cause the Update Dialog to be 
 
 The code accepts the userid of ***admin*** and the password of ***hwstore***.
  
- **If you want to disable the Password Dialog, change the code on line 1336 from**
+ **If you want to disable the PassWord Dialog, change the code on line 1336 from**
 
      if ( ( uID.equals("admin") ) &&
                   ( pwd.equals("hwstore") ) ) {
