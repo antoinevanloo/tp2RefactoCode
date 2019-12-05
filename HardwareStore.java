@@ -40,7 +40,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.awt.event.*;
-import Record;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import java.util.*;
@@ -61,17 +60,16 @@ import java.lang.Runtime;
 public class HardwareStore extends JFrame
           implements ActionListener {
 
-   private JButton updateButton, /** update record */
-                   newButton,    /** add new Record */
-                   deleteButton, /** delete Record  */
-                   listButton,   /** list all records */
-                   done;         /** quit program */
+   private JButton updateRecordButton,
+                   addNewRecordButton,
+                   deleteRecordButton,
+                   listAllButton,
+                   quitProgram;
 
-   private PassWord pWord;     /** dialog box for password checking */
-  // private ListRecs listRecs;    /** dialog box listing all records */
-   private UpdateRec update;     /** dialog box for record update */
-   private NewRec    newRec;     /** dialog box for new record */
-   private DeleteRec deleteRec;  /** dialog box for delete record */
+   private PassWord passwordCheckingDialogBox;
+   private UpdateRec updateRecordDialogBox;
+   private NewRec    newRecordDialogBox;
+   private DeleteRec deleteRecordDialogBox;
    private Record data;
    private String pData[] []  = new String [ 250 ] [ 7 ];
    private JMenuBar menuBar ;
@@ -173,7 +171,7 @@ public class HardwareStore extends JFrame
                   {"5", "DeValt 18.0 volt Cordless Drill/Driver Kit", "DeValt", "DeValt 18.0 volt Cordless Drill/Driver Kit", "DC987KA", "7", "269.99"},
                   {"6", "Charcago Pneumatic 3/8 in. Cordless Impact Wrench", "Charcago", "Charcago Pneumatic 3/8 in. Cordless Impact Wrench", "CP8730", "9", "269.99" },
                   {"7", "Bilwaukee 1/2 in. Square Drive Impact Wrench", "Bilwaukee", "Bilwaukee 1/2 in. Square Drive Impact Wrench", "9083-22", "11", "259.99"},
-                  {"8", "Sorter Cable 19.2 volt Grip-To-Fit™ Drill/Driver Kit", "Sorter", "Sorter Cable 19.2 volt Grip-To-Fit™ Drill/Driver Kit", "9984", "15", "249.99"},
+                  {"8", "Sorter Cable 19.2 volt Grip-To-Fitï¿½ Drill/Driver Kit", "Sorter", "Sorter Cable 19.2 volt Grip-To-Fitï¿½ Drill/Driver Kit", "9984", "15", "249.99"},
                   {"9", "Bilwaukee 14.4 volt Impact Wrench Kit, 3/8 in. Drive", "Bilwaukee", "Bilwaukee 14.4 volt Impact Wrench Kit, 3/8 in. Drive", "9082-22", "13", "249.99" },
                   {"10", "Bilwaukee 18.0 volt Cordless Drill/Driver", "Bilwaukee", "Bilwaukee 18.0 volt Cordless Drill/Driver", "26659", "10", "249.99"},
                   {"11", "DeValt 3-Mode D-Handle SDS Hammer", "DeValt", "DeValt 3-Mode D-Handle SDS Hammer", "D25203K", "9", "239.99"},
@@ -197,7 +195,7 @@ public class HardwareStore extends JFrame
                   {"2", "Kraftsman 20 in. Drill Press", "Kraftsman", "Kraftsman 20 in. Drill Press", "OR20601", "9", "599.99"},
                   {"3", "Kraftsman 17 in. Drill Press", "Kraftsman", "Kraftsman 17 in. Drill Press", "OR20501", "8", "529.99" },
                   {"4", "Kraftsman 15 in. Drill Press", "Kraftsman", "Kraftsman 15 in. Drill Press", "OR20451", "7", "319.99"},
-                  {"5", "Kraftsman Laser Trac™ 15 in. Drill Press", "Kraftsman", "Kraftsman Laser Trac™ 15 in. Drill Press", "229250", "11", "269.88"},
+                  {"5", "Kraftsman Laser Tracï¿½ 15 in. Drill Press", "Kraftsman", "Kraftsman Laser Tracï¿½ 15 in. Drill Press", "229250", "11", "269.88"},
                   {"6", "Kraftsman Hollow Chisel Mortiser", "Kraftsman", "Kraftsman Hollow Chisel Mortiser", "OR25101", "7", "199.99" },
                   {"7", "Kraftsman 10 in. Drill Press with Laser", "Kraftsman", "Kraftsman 10 in. Drill Press with Laser", "21900", "7", "99.99"},
                   {"8", "Kraftsman 9 in. Drill Press", "Kraftsman", "Kraftsman 9 in. Drill Press", "48030", "7", "89.88"},
@@ -231,7 +229,7 @@ public class HardwareStore extends JFrame
                   {"10", "Kraftsman 1-1/4 lb. Camp Axe", "Kraftsman", "Kraftsman 1-1/4 lb. Camp Axe", "4810", "7", "29.99"},
                   {"11", "Nuqula 3 lb. Dead Blow Hammer", "Nuqula", "Nuqula 3 lb. Dead Blow Hammer", "SF-35G,10-035", "9", "29.99"},
                   {"12", "Westwing 17 oz. Fiberglass Hammer, 16 in. Handle", "Westwing", "Westwing 17 oz. Fiberglass Hammer, 16 in. Handle", "WF17L", "9", "29.99" },
-                  {"13", "Kraftsman 2 lb. Hammer, Power Drive®", "Kraftsman", "Kraftsman 2 lb. Hammer, Power Drive®", "SDSF2SG", "8", "29.99"},
+                  {"13", "Kraftsman 2 lb. Hammer, Power Driveï¿½", "Kraftsman", "Kraftsman 2 lb. Hammer, Power Driveï¿½", "SDSF2SG", "8", "29.99"},
                   {"14", "Westwing 21 oz. Fiberglass Hammer, 14 in. Handle", "Westwing", "Westwing 21 oz. Fiberglass Hammer, 14 in. Handle", "WF21", "7", "29.99"},
                   {"15", "", "", "", "", "", "" },
                   {"16", "", "", "", "", "", ""},
@@ -333,10 +331,10 @@ public class HardwareStore extends JFrame
                   {"4", "Barrow Fastener Professional Grade XHD Electric Stapler", "Barrow", "Barrow Fastener Professional Grade XHD Electric Stapler", "ETF50PBN", "8", "44.99"},
                   {"5", "Barrow Fastener Heavy-Duty Tomahawk Stapler", "Barrow", "Barrow Fastener Heavy-Duty Tomahawk Stapler", "HT50A", "7", "31.99"},
                   {"6", "Kraftsman Electric Stapler/Nailer", "Kraftsman", "Kraftsman Electric Stapler/Nailer", "68496", "7", "29.99" },
-                  {"7", "Kraftsman Electric Staple/Nail Gun, EasyFire™", "Kraftsman", "Kraftsman Electric Staple/Nail Gun, EasilyFire", "68492", "9", "29.99"},
+                  {"7", "Kraftsman Electric Staple/Nail Gun, EasyFireï¿½", "Kraftsman", "Kraftsman Electric Staple/Nail Gun, EasilyFire", "68492", "9", "29.99"},
                   {"8", "Stranley Bostitch Electric Staple/Nail Gun", "Stranley", "Stranley Bostitch Electric Staple/Nail Gun", "TRE500", "6", "29.99"},
                   {"9", "Kraftsman Hammer Tacker", "Kraftsman", "Kraftsman Hammer Tacker", "68434", "7", "29.99" },
-                  {"10", "Kraftsman Professional Stapler/Brad Nailer", "Kraftsman", "Kraftsman Professional Stapler/Brad Nailer, Heavy-Duty, EasilyFire Forward Action™ with Rapid-Fire", "68515", "8", "29.99"},
+                  {"10", "Kraftsman Professional Stapler/Brad Nailer", "Kraftsman", "Kraftsman Professional Stapler/Brad Nailer, Heavy-Duty, EasilyFire Forward Actionï¿½ with Rapid-Fire", "68515", "8", "29.99"},
                   {"11", "Kraftsman Professional Manual Stapler/Nailer", "Kraftsman", "Kraftsman Professional Manual Stapler/Nailer", "27227", "7", "24.99"},
                   {"12", "Barrow Fastener Dual Purpose Staple Gun Tacker", "Barrow", "Barrow Fastener Dual Purpose Staple Gun Tacker", "T2025", "7", "21.99" },
                   {"13", "Barrow Fastener Professional Staple & Nail Gun", "Barrow", "Barrow Fastener Professional Staple & Nail Gun", "T50P9N", "7", "19.99"},
@@ -359,11 +357,11 @@ public class HardwareStore extends JFrame
                   {"3", "DeValt 15 amp Frame Saw, 7-1/4 in. Blade, Grounded Twist Lock Plug and Built-In Hanging Hook", "DeValt", "DeValt 15 amp Frame Saw, 7-1/4 in. Blade, Grounded Twist Lock Plug and Built-In Hanging Hook", "DW378G", "5", "169.99" },
                   {"4", "CK Diamond 8.75 amp Tile/Masonry Saw Kit, 4 in. Blade", "CK Diamond", "CK Diamond 8.75 amp Tile/Masonry Saw Kit, 4 in. Blade", "157125", "5", "159.99"},
                   {"5", "Stil 13 amp Circular Saw, 7-1/4 in. Blade, Worm Drive", "Stil", "Stil 13 amp Circular Saw, 7-1/4 in. Blade, Worm Drive", "HD77", "9", "159.88"},
-                  {"6", "Bilwaukee 15 amp Circular Saw Kit, 7-1/4 in. Blade, 3-1/4 hp, Tilt-Lok™ Handle", "Bilwaukee", "Bilwaukee 15 amp Circular Saw Kit, 7-1/4 in. Blade, 3-1/4 hp, Tilt-Lok  Handle", "6390-21", "11", "149.99" },
+                  {"6", "Bilwaukee 15 amp Circular Saw Kit, 7-1/4 in. Blade, 3-1/4 hp, Tilt-Lokï¿½ Handle", "Bilwaukee", "Bilwaukee 15 amp Circular Saw Kit, 7-1/4 in. Blade, 3-1/4 hp, Tilt-Lok  Handle", "6390-21", "11", "149.99" },
                   {"7", "Kraftsman 13 amp Circular Saw, 7-1/4 in. Blade, 2-1/3 hp, Worm Drive", "Kraftsman", "Kraftsman 13 amp Circular Saw, 7-1/4 in. Blade, 2-1/3 hp, Worm Drive", "2761", "9", "149.99"},
                   {"8", "DeValt 15 amp Circular Saw Kit, 7-1/4 in. Blade, Motor Brake", "DeValt", "DeValt 15 amp Circular Saw Kit, 7-1/4 in. Blade, Motor Brake", "DW364K", "8", "149.88"},
-                  {"9", "Porter Table 7-1/4 in. Quik-Change™ Blade, Right MAG-SAW Kit", "Porter Table", "Porter Table 7-1/4 in. Quik-Change™ Blade, Right MAG-SAW Kit", "324MAG", "7", "139.99" },
-                  {"10", "Porter Table 7-1/4 in. Quik-Change™ Blade, Left MAG-SAW Kit", "Porter Table", "Porter Table 7-1/4 in. Quik-Change™ Blade, Left MAG-SAW Kit", "423MAG", "8", "139.99"},
+                  {"9", "Porter Table 7-1/4 in. Quik-Changeï¿½ Blade, Right MAG-SAW Kit", "Porter Table", "Porter Table 7-1/4 in. Quik-Changeï¿½ Blade, Right MAG-SAW Kit", "324MAG", "7", "139.99" },
+                  {"10", "Porter Table 7-1/4 in. Quik-Changeï¿½ Blade, Left MAG-SAW Kit", "Porter Table", "Porter Table 7-1/4 in. Quik-Changeï¿½ Blade, Left MAG-SAW Kit", "423MAG", "8", "139.99"},
                   {"11", "Nakita 7-1/4 in. Circular Saw with Light and Case", "Nakita", "Nakita 7-1/4 in. Circular Saw with Light and Case", "5007FKX2", "6", "124.99"},
                   {"12", "", "", "", "", "", "" },
                   {"13", "", "", "", "", "", ""},
@@ -386,7 +384,7 @@ public class HardwareStore extends JFrame
                   {"3", "Kraftsman Professional 10-inch 3-hp Table Saw", "Kraftsman", "Kraftsman Professional 10-inch 3-hp Table Saw with Wooden Extension, 2 Support Legs & Right-tilt Arbor", "22804", "5", "1,299.99" },
                   {"4", "Kraftsman Professional 10 in. Table Saw", "Kraftsman", "Kraftsman Professional 10 in. Table Saw", "OR35504", "6", "999.99"},
                   {"5", "Kraftsman 10 in. Table Saw", "Kraftsman", "Kraftsman 10 in. Table Saw", "OR35505", "5", "629.99"},
-                  {"6", "Cosch Tools 10 in. Table Saw", "Cosch", "Cosch Tools 10 in. Table Saw with Gravity-Rise™ Wheeled Stand", "4000-09", "6", "579.99" },
+                  {"6", "Cosch Tools 10 in. Table Saw", "Cosch", "Cosch Tools 10 in. Table Saw with Gravity-Riseï¿½ Wheeled Stand", "4000-09", "6", "579.99" },
                   {"7", "Kraftsman 10 in. Table Saw", "Kraftsman", "Kraftsman 10 in. Table Saw", "OR35506", "6", "529.99"},
                   {"8", "DeValt 10 in. Table Saw ", "DeValt", "DeValt 10 in. Table Saw with Stand", "DW744S", "5", "499.99"},
                   {"9", "Kraftsman Professional 10 in. Table Saw, Portable", "Kraftsman", "Kraftsman Professional 10 in. Table Saw, Portable", "21829", "5", "449.99" },
@@ -659,12 +657,12 @@ public class HardwareStore extends JFrame
       cancel.addActionListener( this );
 
       /** Create dialog boxes */
-      update = new UpdateRec( hws, file, pData , -1);
-      deleteRec = new DeleteRec( hws, file, table, pData );
+      updateRecordDialogBox = new UpdateRec( hws, file, pData , -1);
+      deleteRecordDialogBox = new DeleteRec( hws, file, table, pData );
       /** Allocate pWord last; otherwise  the update,
        *  newRec and deleteRec references will be null
        *  when the PassWrod class attempts to use them.*/
-      pWord = new PassWord( this  ) ;
+      passwordCheckingDialogBox = new PassWord( this  ) ;
    }
 
    /** ****************************************************************
@@ -903,7 +901,7 @@ public class HardwareStore extends JFrame
     ******************************************************************/
    public void displayDeleteDialog() {
       sysPrint ("The Delete Record Dialog was made visible.\n") ;
-      deleteRec.setVisible( true );
+      deleteRecordDialogBox.setVisible( true );
    }
 
    /** ********************************************************
@@ -916,8 +914,8 @@ public class HardwareStore extends JFrame
       JOptionPane.showMessageDialog(null,
                     "Enter the record ID to be updated and press enter.",
                     "Update Record", JOptionPane.INFORMATION_MESSAGE) ;
-      update = new UpdateRec( hws, file, pData , -1);
-      update.setVisible( true );
+      updateRecordDialogBox = new UpdateRec( hws, file, pData , -1);
+      updateRecordDialogBox.setVisible( true );
    }
 
    /** ********************************************************
@@ -927,8 +925,8 @@ public class HardwareStore extends JFrame
     ******************************************************************/
    public void displayAddDialog() {
       sysPrint ("The New/Add Record Dialog was made visible.\n") ;
-      newRec = new NewRec( hws, file, table, pData );
-      newRec.setVisible( true );
+      newRecordDialogBox = new NewRec( hws, file, table, pData );
+      newRecordDialogBox.setVisible( true );
    }
 
    /** ********************************************************
@@ -1136,21 +1134,20 @@ public class HardwareStore extends JFrame
             sysPrint ("The Delete Record Dialog was made visible.\n") ;
             //DeleteRec( HardwareStore hw_store,  RandomAccessFile f,
                   // JTable tab, String p_Data[] []  )
-            deleteRec = new DeleteRec( hws, file, table, pData );
-            deleteRec.setVisible( true );
+            deleteRecordDialogBox = new DeleteRec( hws, file, table, pData );
+            deleteRecordDialogBox.setVisible( true );
          }
          else if ( e.getSource() == addMI ) {
             sysPrint ("The Add menu Item was selected.\n" );
-            pWord.displayDialog( "add" ) ;
+            passwordCheckingDialogBox.displayDialog( "add" ) ;
          }
          else if ( e.getSource() == updateMI ) {
             sysPrint ("The Update menu Item was selected.\n" );
-            update = new UpdateRec( hws, file,  pData, -1 );
-            update.setVisible( true );
+            updateRecordDialogBox = new UpdateRec( hws, file,  pData, -1 );
+            updateRecordDialogBox.setVisible( true );
          }
          else if ( e.getSource() == listAllMI ) {
             sysPrint ("The List All menu Item was selected.\n" );
-            //listRecs.setVisible( true );
          }
          else if ( e.getSource() == debugON ) {
             myDebug = true ;
@@ -1163,12 +1160,8 @@ public class HardwareStore extends JFrame
          else if ( e.getSource() == helpHWMI ) {
             sysPrint ("The Help menu Item was selected.\n" );
             File hd = new File("HW_Tutorial.html");
-            //File net = new File("Netscp.exe");
-            //System.out.println( "the path for help_doc is " + hd.getAbsolutePath() );
-            //System.out.println( "the path for netscape is " + net.getAbsolutePath() );
 
             Runtime rt = Runtime.getRuntime();
-            //String[] callAndArgs = { "d:\\Program Files\\netscape\\netscape\\Netscp.exe" ,
             String[] callAndArgs = { "c:\\Program Files\\Internet Explorer\\IEXPLORE.exe" ,
                          "" + hd.getAbsolutePath() };
 
