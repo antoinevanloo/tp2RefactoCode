@@ -53,19 +53,15 @@ public class HardwareStore extends JFrame
    private DeleteRecord deleteRecordDialogBox;
    private Record data;
    private String pData[] []  = new String [ 250 ] [ 7 ];
-   /** File Menu Items */
-   private JMenuItem eMI ;
+   private JMenuItem fileMenuItems;
    /** View Menu Items */
    private JMenuItem lmMI, lmtMI, hdMI, dpMI, hamMI, csMI, tabMI, bandMI,
                sandMI, stapMI, wdvMI, sccMI;
-   /** Options Menu Items */
-   private JMenuItem deleteMI, addMI, updateMI, listAllMI ;
-   /** Tools Menu Items */
+   private JMenuItem deleteMenuItem, addMenuItem, updateMenuItem, listAllMenuItem ;
    private JMenuItem debugON, debugOFF ;
    /** Help Menu Items */
-   private JMenuItem   helpHWMI ;
-   /** About Menu Items */
-   private JMenuItem   aboutHWMI ;
+   private JMenuItem helpHWMenuItem;
+   private JMenuItem aboutHWMenuItem;
    private MenuHandler menuHandler = new MenuHandler();
    private JTable table;
    private RandomAccessFile file;  /** file from which data is read */
@@ -448,9 +444,9 @@ public class HardwareStore extends JFrame
 
         menuBar.add(fileMenu);
         /** Add the Exit menuitems */
-        eMI = new JMenuItem("Exit");
-        fileMenu.add(eMI);
-        eMI.addActionListener(menuHandler);
+        fileMenuItems = new JMenuItem("Exit");
+        fileMenu.add(fileMenuItems);
+        fileMenuItems.addActionListener(menuHandler);
 
         /** Create the View menu and add it to the menubar  */
         JMenu viewMenu = new JMenu("View");
@@ -521,26 +517,26 @@ public class HardwareStore extends JFrame
         JMenu optionsMenu = new JMenu("Options");
 
         /** Add the List All menuitems */
-        listAllMI = new JMenuItem("List All");
-        optionsMenu.add(listAllMI);
-        listAllMI.addActionListener(menuHandler);
+        listAllMenuItem = new JMenuItem("List All");
+        optionsMenu.add(listAllMenuItem);
+        listAllMenuItem.addActionListener(menuHandler);
         optionsMenu.addSeparator();
 
         /** Add the Add menuitems */
-        addMI = new JMenuItem("Add");
-        optionsMenu.add(addMI);
-        addMI.addActionListener(menuHandler);
+        addMenuItem = new JMenuItem("Add");
+        optionsMenu.add(addMenuItem);
+        addMenuItem.addActionListener(menuHandler);
 
         /** Add the Update menuitems */
-        updateMI = new JMenuItem("Update");
-        optionsMenu.add(updateMI);
-        updateMI.addActionListener(menuHandler);
+        updateMenuItem = new JMenuItem("Update");
+        optionsMenu.add(updateMenuItem);
+        updateMenuItem.addActionListener(menuHandler);
         optionsMenu.addSeparator();
 
         /** Add the Delete menuitems */
-        deleteMI = new JMenuItem("Delete");
-        optionsMenu.add(deleteMI);
-        deleteMI.addActionListener(menuHandler);
+        deleteMenuItem = new JMenuItem("Delete");
+        optionsMenu.add(deleteMenuItem);
+        deleteMenuItem.addActionListener(menuHandler);
 
         menuBar.add(optionsMenu);
 
@@ -559,9 +555,9 @@ public class HardwareStore extends JFrame
         JMenu helpMenu = new JMenu("Help");
 
         /** Add the Help HW Store menuitems */
-        helpHWMI = new JMenuItem("Help on HW Store");
-        helpMenu.add(helpHWMI);
-        helpHWMI.addActionListener(menuHandler);
+        helpHWMenuItem = new JMenuItem("Help on HW Store");
+        helpMenu.add(helpHWMenuItem);
+        helpHWMenuItem.addActionListener(menuHandler);
 
         menuBar.add(helpMenu);
 
@@ -569,9 +565,9 @@ public class HardwareStore extends JFrame
         JMenu aboutMenu = new JMenu("About");
 
         /** Add the About Store menuitems */
-        aboutHWMI = new JMenuItem("About HW Store");
-        aboutMenu.add(aboutHWMI);
-        aboutHWMI.addActionListener(menuHandler);
+        aboutHWMenuItem = new JMenuItem("About HW Store");
+        aboutMenu.add(aboutHWMenuItem);
+        aboutHWMenuItem.addActionListener(menuHandler);
 
         menuBar.add(aboutMenu);
     }
@@ -1005,11 +1001,6 @@ public class HardwareStore extends JFrame
 
     }
 
-
-    /** ********************************************************
-     *  Method: main() is the entry point that Java call on the
-     *          start of this program.
-     ********************************************************/
     public static void main(String args[]) {
         HardwareStore hwstore = new HardwareStore();
         hwstore.hws = hwstore;
@@ -1022,7 +1013,7 @@ public class HardwareStore extends JFrame
     public class MenuHandler implements ActionListener {
         public void actionPerformed(ActionEvent e) {
 
-            if (e.getSource() == eMI) {
+            if (e.getSource() == fileMenuItems) {
                 /**The Exit menu Item was selected. */
                 cleanup();
             } else if (e.getSource() == lmMI) {
@@ -1074,23 +1065,23 @@ public class HardwareStore extends JFrame
             sysPrint ("The Storage, Chests & Cabinets menu Item was selected.\n" );
             //ListRecs BPTRecs = new ListRecs( hws , "SCC", "Storage, Chests & Cabinets" );
          }
-         else if ( e.getSource() == deleteMI ) {
+         else if ( e.getSource() == deleteMenuItem ) {
             sysPrint ("The Delete Record Dialog was made visible.\n") ;
             //DeleteRec( HardwareStore hw_store,  RandomAccessFile f,
                   // JTable tab, String p_Data[] []  )
             deleteRecordDialogBox = new DeleteRecord( hws, file, table, pData );
             deleteRecordDialogBox.setVisible( true );
          }
-         else if ( e.getSource() == addMI ) {
+         else if ( e.getSource() == addMenuItem ) {
             sysPrint ("The Add menu Item was selected.\n" );
             passwordCheckingDialogBox.displayDialog( "add" ) ;
          }
-         else if ( e.getSource() == updateMI ) {
+         else if ( e.getSource() == updateMenuItem ) {
             sysPrint ("The Update menu Item was selected.\n" );
             updateRecordDialogBox = new UpdateRecord( hws, file,  pData, -1 );
             updateRecordDialogBox.setVisible( true );
          }
-         else if ( e.getSource() == listAllMI ) {
+         else if ( e.getSource() == listAllMenuItem ) {
             sysPrint ("The List All menu Item was selected.\n" );
          }
          else if ( e.getSource() == debugON ) {
@@ -1101,7 +1092,7 @@ public class HardwareStore extends JFrame
             sysPrint ("Debugging for this execution is turned off.\n" );
             myDebug = false ;
          }
-         else if ( e.getSource() == helpHWMI ) {
+         else if ( e.getSource() == helpHWMenuItem ) {
             sysPrint ("The Help menu Item was selected.\n" );
             File hd = new File("HW_Tutorial.html");
 
@@ -1122,7 +1113,7 @@ public class HardwareStore extends JFrame
                     System.err.println(
                             "Interrupted waiting for process!");
                 }
-            } else if (e.getSource() == aboutHWMI) {
+            } else if (e.getSource() == aboutHWMenuItem) {
                 sysPrint("The About menu Item was selected.\n");
                 Runtime rt = Runtime.getRuntime();
                 String[] callAndArgs = {"c:\\Program Files\\Internet Explorer\\IEXPLORE.exe",
@@ -1143,65 +1134,7 @@ public class HardwareStore extends JFrame
             String current = (String) e.getActionCommand();
         }
     }
-
-    /** ********************************************************
-     *  class: WindowHandler
-     ********************************************************/
-    public class WindowHandler extends WindowAdapter {
-        HardwareStore h;
-
-        /** ********************************************************
-         *  Method: WindowHandler()
-         ********************************************************/
-        public WindowHandler(HardwareStore s) {
-            h = s;
-        }
-
-        /** ********************************************************
-         *  Method: windowClosing()
-         ********************************************************/
-        public void windowClosing(WindowEvent e) {
-            h.cleanup();
-        }
-    }
-
-    /** ********************************************************
-     *  Class:
-     ********************************************************/
-    public class MouseClickedHandler extends MouseAdapter {
-        JTable table;
-        String pData[][], columnNames[];
-        RandomAccessFile f;
-
-        /** ********************************************************
-         *  Method:
-         ********************************************************/
-        MouseClickedHandler(RandomAccessFile fPassed, JTable tablePassed,
-                            String p_Data[][]) {
-            table = tablePassed;
-            pData = p_Data;
-            f = fPassed;
-
-        }
-
-        /** ********************************************************
-         *  Method: mouseClicked()
-         ********************************************************/
-        public void mouseClicked(MouseEvent e) {
-            if (e.getSource() == table) {
-                int ii = table.getSelectedRow();
-                JOptionPane.showMessageDialog(null,
-                        "Enter the record ID to be updated and press enter.",
-                        "Update Record", JOptionPane.INFORMATION_MESSAGE);
-                UpdateRecord update = new UpdateRecord(hws, f, pData, ii);
-                if (ii < 250) {
-                    update.setVisible(true);
-                    table.repaint();
-                }
-            }
-        }
-    }
-
+    
     public File getaFile() {
         return aFile;
     }
