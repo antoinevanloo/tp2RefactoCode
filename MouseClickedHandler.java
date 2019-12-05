@@ -10,8 +10,8 @@ public class MouseClickedHandler extends MouseAdapter {
     String pData[][], columnNames[];
     RandomAccessFile f;
 
-    MouseClickedHandler(RandomAccessFile fPassed, JTable tablePassed,
-                        String p_Data[][],HardwareStore hwstore) {
+     public MouseClickedHandler(RandomAccessFile fPassed, JTable tablePassed,
+                               String p_Data[][], HardwareStore hwstore) {
         table = tablePassed;
         pData = p_Data;
         f = fPassed;
