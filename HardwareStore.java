@@ -713,48 +713,59 @@ public class HardwareStore extends JFrame
      *********************************************************************/
     public void display(String str) {
 
-        String df = null, title = null;
+        String fileName = null, title = null;
 
-        if (str.equals("Lawn Mowers")) {
-            df = "lawnmower.dat";
-            aFile = new File("lawnmower.dat");
-            title = "Hardware Store: Lawn Mowers";
-        } else if (str.equals("Lawn Tractor Mowers")) {
-            df = "lawnTractor.dat";
-            aFile = new File("lawnTractor.dat");
-            title = "Hardware Store: Lawn Tractor Mowers";
-        } else if (str.equals("Hand Drill Tools")) {
-            df = "handDrill.dat";
-            aFile = new File("handDrill.dat");
-            title = "Hardware Store:  Hand Drill Tools";
-        } else if (str.equals("Drill Press Power Tools")) {
-            df = "drillPress.dat";
-            aFile = new File("drillPress.dat");
-            title = "Hardware Store: Drill Press Power Tools";
-        } else if (str.equals("Circular Saws")) {
-            df = "circularSaw.dat";
-            aFile = new File("circularSaw.dat");
-            title = "Hardware Store: Circular Saws";
-        } else if (str.equals("Hammers")) {
-            df = "hammer.dat";
-            aFile = new File("hammer.dat");
-            title = "Hardware Store: Hammers";
-        } else if (str.equals("Table Saws")) {
-            df = "tableSaw.dat";
-            aFile = new File("tableSaw.dat");
-            title = "Hardware Store: Table Saws";
-        } else if (str.equals("Band Saws")) {
-            df = "bandSaw.dat";
-            aFile = new File("bandSaw.dat");
-            title = "Hardware Store: Band Saws";
-        } else if (str.equals("Sanders")) {
-            df = "sanders.dat";
-            aFile = new File("sanders.dat");
-            title = "Hardware Store: Sanders";
-        } else if (str.equals("Staplers")) {
-            df = "stapler.dat";
-            aFile = new File("stapler.dat");
-            title = "Hardware Store: Staplers";
+        switch (str) {
+            case "Lawn Mowers":
+                fileName = "lawnmower.dat";
+                aFile = new File("lawnmower.dat");
+                title = "Hardware Store: Lawn Mowers";
+                break;
+            case "Lawn Tractor Mowers":
+                fileName = "lawnTractor.dat";
+                aFile = new File("lawnTractor.dat");
+                title = "Hardware Store: Lawn Tractor Mowers";
+                break;
+            case "Hand Drill Tools":
+                fileName = "handDrill.dat";
+                aFile = new File("handDrill.dat");
+                title = "Hardware Store:  Hand Drill Tools";
+                break;
+            case "Drill Press Power Tools":
+                fileName = "drillPress.dat";
+                aFile = new File("drillPress.dat");
+                title = "Hardware Store: Drill Press Power Tools";
+                break;
+            case "Circular Saws":
+                fileName = "circularSaw.dat";
+                aFile = new File("circularSaw.dat");
+                title = "Hardware Store: Circular Saws";
+                break;
+            case "Hammers":
+                fileName = "hammer.dat";
+                aFile = new File("hammer.dat");
+                title = "Hardware Store: Hammers";
+                break;
+            case "Table Saws":
+                fileName = "tableSaw.dat";
+                aFile = new File("tableSaw.dat");
+                title = "Hardware Store: Table Saws";
+                break;
+            case "Band Saws":
+                fileName = "bandSaw.dat";
+                aFile = new File("bandSaw.dat");
+                title = "Hardware Store: Band Saws";
+                break;
+            case "Sanders":
+                fileName = "sanders.dat";
+                aFile = new File("sanders.dat");
+                title = "Hardware Store: Sanders";
+                break;
+            case "Staplers":
+                fileName = "stapler.dat";
+                aFile = new File("stapler.dat");
+                title = "Hardware Store: Staplers";
+                break;
         }
 
         try {
@@ -763,49 +774,38 @@ public class HardwareStore extends JFrame
              *  and initialize it to 250 empty records.
              */
 
-            sysPrint("display(): 1a - checking to see if " + df + " exists.");
+            sysPrint("display(): 1a - checking to see if " + fileName + " exists.");
             if (!aFile.exists()) {
 
-                sysPrint("display(): 1b - " + df + " does not exist.");
+                sysPrint("display(): 1b - " + fileName + " does not exist.");
 
             } else {
-                dataReadFile = new RandomAccessFile(df, "rw");
+                dataReadFile = new RandomAccessFile(fileName, "rw");
 
                 this.setTitle(title);
 
-                Redisplay(dataReadFile, pData);
+                RedisplayJTable(dataReadFile, pData);
             }
 
             dataReadFile.close();
         } catch (IOException e) {
             System.err.println(e.toString());
-            System.err.println("Failed in opening " + df);
+            System.err.println("Failed in opening " + fileName);
             System.exit(1);
         }
 
     }
 
-    /**
-     * *******************************************************
-     * Method: Redisplay() is used to redisplay/repopualte the
-     * JTable.
-     * <p>
-     * Called from the
-     * 1- display() method
-     * 2- actionPerformed() method of the UpdateRecord class
-     * 3- actionPerformed() method of the DeleteRec class
-     ********************************************************/
-    public void Redisplay(RandomAccessFile file, String a[][]) {
+    public void RedisplayJTable(RandomAccessFile file, String a[][]) {
 
-
-        for (int ii = 0; ii < numEntries + 5; ii++) {
-            a[ii][0] = "";
-            a[ii][1] = "";
-            a[ii][2] = "";
-            a[ii][3] = "";
-            a[ii][4] = "";
-            a[ii][5] = "";
-            a[ii][6] = "";
+        for (int i = 0; i < numEntries + 5; i++) {
+            a[i][0] = "";
+            a[i][1] = "";
+            a[i][2] = "";
+            a[i][3] = "";
+            a[i][4] = "";
+            a[i][5] = "";
+            a[i][6] = "";
         }
         int entries = toArray(file, a);
         sysPrint("Redisplay(): 1  - The number of entries is " + entries);
@@ -818,30 +818,18 @@ public class HardwareStore extends JFrame
         c.validate();
     }
 
-    /**
-     * ******************************************************************
-     * Method: actionPerformed() - This is the event handler that responds
-     * to the the cancel button  on the main frame.
-     *********************************************************************/
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == refresh) {
             sysPrint("\nThe Refresh button was pressed. ");
-            Container cc = getContentPane();
+            Container container = getContentPane();
 
             table = new JTable(pData, columnNames);
-            cc.validate();
+            container.validate();
         } else if (e.getSource() == cancel)
             cleanup();
     }
 
-    /**
-     * ***************************************************************
-     * Method: cleanup() -This is the cleanup method that is used to close
-     * the hardware.dat file and exit the application.
-     * <p>
-     * Called from the actionPerformed() method
-     *********************************************************************/
     public void cleanup() {
         try {
             dataReadFile.close();
@@ -853,23 +841,11 @@ public class HardwareStore extends JFrame
         System.exit(0);
     }
 
-    /**
-     * **************************************************************
-     * Method: displayDeleteDialog()
-     * <p>
-     * Called from the actionPerformed() method of the PassWord class
-     ******************************************************************/
     public void displayDeleteDialog() {
         sysPrint("The Delete Record Dialog was made visible.\n");
         deleteRecordDialogBox.setVisible(true);
     }
 
-    /**
-     * *******************************************************
-     * Method: displayUpdateDialog()
-     * <p>
-     * Called from the actionPerformed() method of the PassWord class
-     ******************************************************************/
     public void displayUpdateDialog() {
         sysPrint("The Update Record Dialog was made visible.\n");
         JOptionPane.showMessageDialog(null,
@@ -879,46 +855,16 @@ public class HardwareStore extends JFrame
         updateRecordDialogBox.setVisible(true);
     }
 
-    /**
-     * *******************************************************
-     * Method: displayAddDialog()
-     * <p>
-     * Called from the actionPerformed() method of the PassWord class
-     ******************************************************************/
     public void displayAddDialog() {
         sysPrint("The New/Add Record Dialog was made visible.\n");
         NewRecord newRecordDialogBox = new NewRecord(hws, dataReadFile, table, pData);
         newRecordDialogBox.setVisible(true);
     }
 
-    /**
-     * *******************************************************
-     * Method: setEntries() is called to set the number of current
-     * entries in the pData array.
-     ********************************************************/
     public void setEntries(int ent) {
         numEntries = ent;
     }
 
-    /**
-     * *******************************************************
-     * Method: getPData() returns a specific row and column
-     * <p>
-     * This method is no longer used
-     ********************************************************/
-    public String getPData(int ii, int iii) {
-        return pData[ii][iii];
-    }
-
-    /**
-     * *******************************************************
-     * Method: getEntries() returns the number of current entries
-     * in the pData array.
-     * <p>
-     * Called from
-     * 1- actionPerformed() method of the NewRec class
-     * 2- actionPerformed() method of the DeleteRec class
-     ********************************************************/
     public int getEntries() {
         return numEntries;
     }
@@ -1074,10 +1020,8 @@ public class HardwareStore extends JFrame
                 display("Staplers");
             } else if (e.getSource() == wdvMI) {
                 sysPrint("The Wet-Dry Vacs menu Item was selected.\n");
-                // ListRecs BPTRecs = new ListRecs( hws , "WDV", "Wet-Dry Vacs" );
             } else if (e.getSource() == sccMI) {
                 sysPrint("The Storage, Chests & Cabinets menu Item was selected.\n");
-                //ListRecs BPTRecs = new ListRecs( hws , "SCC", "Storage, Chests & Cabinets" );
             } else if (e.getSource() == deleteMenuItem) {
                 sysPrint("The Delete Record Dialog was made visible.\n");
                 deleteRecordDialogBox = new DeleteRecord(hws, dataReadFile, table, pData);
@@ -1136,7 +1080,6 @@ public class HardwareStore extends JFrame
                             "Interrupted waiting for process!");
                 }
             }
-            String current = (String) e.getActionCommand();
         }
     }
 
