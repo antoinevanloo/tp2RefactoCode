@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-public class UpdateRec extends Dialog implements ActionListener {
+public class UpdateRecord extends Dialog implements ActionListener {
     private RandomAccessFile file;
     private JTextField recID, toolType, brandName, toolDesc,
             partNum, quantity, price;
@@ -20,8 +20,8 @@ public class UpdateRec extends Dialog implements ActionListener {
     private boolean found = false;
     private final static int NUMBER_COLUMNS_10 = 10;
 
-    public UpdateRec(HardwareStore hw_store, RandomAccessFile f,
-                     String p_Data[][], int iiPassed) {
+    public UpdateRecord(HardwareStore hw_store, RandomAccessFile f,
+                        String p_Data[][], int iiPassed) {
 
 
         super(new Frame(), "Update Record", true);
@@ -37,7 +37,6 @@ public class UpdateRec extends Dialog implements ActionListener {
 
     public void upDSetup() {
 
-        /** create the text fields */
         recID = new JTextField(NUMBER_COLUMNS_10);
         toolType = new JTextField(NUMBER_COLUMNS_10);
         brandName = new JTextField(NUMBER_COLUMNS_10);
@@ -46,7 +45,6 @@ public class UpdateRec extends Dialog implements ActionListener {
         quantity = new JTextField(NUMBER_COLUMNS_10);
         price = new JTextField(NUMBER_COLUMNS_10);
 
-        /** create the labels */
         recIDLabel = new JLabel("Record ID");
         toolTypeLabel = new JLabel("Type of Tool");
         brandNameLabel = new JLabel("Brand Name");
@@ -55,11 +53,9 @@ public class UpdateRec extends Dialog implements ActionListener {
         quantityLabel = new JLabel("Quantity");
         priceLabel = new JLabel("Price");
 
-        /** create the buttons */
         save = new JButton("Save Changes");
         cancel = new JButton("Cancel");
 
-        /** attach the ActionListener */
         recID.addActionListener(this);
         save.addActionListener(this);
         cancel.addActionListener(this);
@@ -116,14 +112,14 @@ public class UpdateRec extends Dialog implements ActionListener {
 
             theRecID = Integer.parseInt(recID.getText());
 
-            System.out.println("UpdateRec(): 2a - The record id being sought is " + theRecID);
+            System.out.println("UpdateRecord(): 2a - The record id being sought is " + theRecID);
 
-            for (int iii = 0; iii < pData.length; iii++) {
-                if (pData[iii][0] != null) {
-                    if (Integer.parseInt(pData[iii][0]) == theRecID) {
-                        theRecID = Integer.parseInt(pData[iii][0]);
+            for (String[] pDatum : pData) {
+                if (pDatum[0] != null) {
+                    if (Integer.parseInt(pDatum[0]) == theRecID) {
+                        theRecID = Integer.parseInt(pDatum[0]);
                         found = true;
-                        System.out.println("UpdateRec(): 2b - The record id was found.");
+                        System.out.println("UpdateRecord(): 2b - The record id was found.");
                         break;
                     }
                 }
@@ -141,27 +137,20 @@ public class UpdateRec extends Dialog implements ActionListener {
                 partNum.setText(data.getPartNumber().trim());
                 quantity.setText(Integer.toString(data.getQuantity()));
                 price.setText(data.getCost().trim());
-                System.out.println("UpdateRec(): 2c - The record found was " +
+                System.out.println("UpdateRecord(): 2c - The record found was " +
                         data.getRecID() + " " +
                         data.getBrandName() + " " +
                         data.getToolDesc() + " " +
                         data.getQuantity() + " " +
                         data.getCost() + " in file " + hwstore.getaFile());
             } catch (IOException ex) {
-                recID.setText("UpdateRec(): 2d -  Error reading file");
+                recID.setText("UpdateRecord(): 2d -  Error reading file");
             }
 
-            if (data.getRecID() >= 0) {
-               /*recID.setText( String.valueOf( data.getRecID() ) );
-               toolType.setText( data.getToolType().trim() );
-               brandName.setText( data.getBrandName().trim() ) ;
-               toolDesc.setText( data.getToolDesc().trim() ) ;
-               partNum.setText( data.getPartNumber().trim() ) ;
-               quantity.setText( Integer.toString( data.getQuantity() ) );
-               price.setText(  data.getCost().trim() ); */
-            } else
+            if (data.getRecID() < 0) {
                 recID.setText("This record " +
                         theRecID + " does not exist");
+            }
         } else if (e.getSource() == save) {
             try {
                 data.setRecID(Integer.parseInt(recID.getText()));
@@ -176,7 +165,7 @@ public class UpdateRec extends Dialog implements ActionListener {
                 file.seek(theRecID * data.getSize());
                 data.write(file);
 
-                System.out.println("UpdateRec(): 3 - The record found was " +
+                System.out.println("UpdateRecord(): 3 - The record found was " +
                         data.getRecID() + " " +
                         data.getBrandName() + " " +
                         data.getToolDesc() + " " +
