@@ -48,29 +48,28 @@ import java.lang.Runtime;
 public class HardwareStore extends JFrame
         implements ActionListener {
 
-   private PassWord passwordCheckingDialogBox;
-   private UpdateRecord updateRecordDialogBox;
-   private DeleteRecord deleteRecordDialogBox;
-   private Record data;
-   private String pData[] []  = new String [ 250 ] [ 7 ];
-   private JMenuItem fileMenuItems;
-   /** View Menu Items */
-   private JMenuItem lmMI, lmtMI, hdMI, dpMI, hamMI, csMI, tabMI, bandMI,
-               sandMI, stapMI, wdvMI, sccMI;
-   private JMenuItem deleteMenuItem, addMenuItem, updateMenuItem, listAllMenuItem ;
-   private JMenuItem debugON, debugOFF ;
-   /** Help Menu Items */
-   private JMenuItem helpHWMenuItem;
-   private JMenuItem aboutHWMenuItem;
-   private MenuHandler menuHandler = new MenuHandler();
-   private JTable table;
-   private RandomAccessFile file;  /** file from which data is read */
-   private File aFile ;
-   private JButton cancel, refresh;
-   private JPanel buttonPanel ;
-   protected boolean validPW = false ;
-   private boolean myDebug = false ; /** This flag toggles debug */
-   HardwareStore hws ;
+    private PassWord passwordCheckingDialogBox;
+    private UpdateRecord updateRecordDialogBox;
+    private DeleteRecord deleteRecordDialogBox;
+    private Record data;
+    private String pData[][] = new String[250][7];
+    private JMenuItem fileMenuItems;
+    /**
+     * View Menu Items
+     */
+    private JMenuItem lmMI, lmtMI, hdMI, dpMI, hamMI, csMI, tabMI, bandMI,
+            sandMI, stapMI, wdvMI, sccMI;
+    private JMenuItem deleteMenuItem, addMenuItem, updateMenuItem, listAllMenuItem;
+    private JMenuItem debugON, debugOFF;
+    private JMenuItem helpHWMenuItem;
+    private JMenuItem aboutHWMenuItem;
+    private MenuHandler menuHandler = new MenuHandler();
+    private JTable table;
+    private RandomAccessFile dataReadFile;
+    private File aFile;
+    private JButton cancel, refresh;
+    private boolean toggleDebug = false;
+    HardwareStore hws;
 
     private String columnNames[] = {"Record ID", "Type of tool",
             "Brand Name", "Tool Description", "partNum",
@@ -381,7 +380,8 @@ public class HardwareStore extends JFrame
     private Container c;
     private int numEntries = 0, ZERO;
 
-    /** ********************************************************
+    /**
+     * *******************************************************
      * Method: HardwareStore() constructor initializes the
      * 1- Menu bar
      * 2- Tables
@@ -426,7 +426,8 @@ public class HardwareStore extends JFrame
     }
 
 
-    /** ************************************************************
+    /**
+     * ***********************************************************
      * setupMenu() is called from the HardwareStore() constructor
      * setupMenu() is used to create the
      * 1- Menu Bar
@@ -572,12 +573,13 @@ public class HardwareStore extends JFrame
         menuBar.add(aboutMenu);
     }
 
-    /** ********************************************************
+    /**
+     * *******************************************************
      * Method: setup() is used to
      * 1- Open the lawnmower.dat file
      * 2- Call the toArray() method to popualte the JTable with
-     *    the contents of the lawnmower.dat file.
-     *
+     * the contents of the lawnmower.dat file.
+     * <p>
      * Called by the HardwareStore() constructor
      ********************************************************/
     public void setup() {
@@ -588,13 +590,13 @@ public class HardwareStore extends JFrame
              *  determine the number of records in the file
              */
 
-            file = new RandomAccessFile("lawnmower.dat", "rw");
+            dataReadFile = new RandomAccessFile("lawnmower.dat", "rw");
 
             aFile = new File("lawnmower.dat");
 
-            numEntries = toArray(file, pData);
+            numEntries = toArray(dataReadFile, pData);
 
-            file.close();
+            dataReadFile.close();
         } catch (IOException ignored) {
         }
 
@@ -609,7 +611,7 @@ public class HardwareStore extends JFrame
          * 5- Add a scrollpane to the table.
          *****************************************************************/
         table = new JTable(pData, columnNames);
-        table.addMouseListener(new MouseClickedHandler(file, table, pData));
+        table.addMouseListener(new MouseClickedHandler(dataReadFile, table, pData, this));
         table.setEnabled(true);
 
         c.add(table, BorderLayout.CENTER);
@@ -624,25 +626,26 @@ public class HardwareStore extends JFrame
         refresh.addActionListener(this);
         cancel.addActionListener(this);
 
-      /** Create dialog boxes */
-      updateRecordDialogBox = new UpdateRecord( hws, file, pData , -1);
-      deleteRecordDialogBox = new DeleteRecord( hws, file, table, pData );
-      /** Allocate pWord last; otherwise  the update,
-       *  newRec and deleteRec references will be null
-       *  when the PassWrod class attempts to use them.*/
-      passwordCheckingDialogBox = new PassWord( this  ) ;
-   }
+        /** Create dialog boxes */
+        updateRecordDialogBox = new UpdateRecord(hws, dataReadFile, pData, -1);
+        deleteRecordDialogBox = new DeleteRecord(hws, dataReadFile, table, pData);
+        /** Allocate pWord last; otherwise  the update,
+         *  newRec and deleteRec references will be null
+         *  when the PassWrod class attempts to use them.*/
+        passwordCheckingDialogBox = new PassWord(this);
+    }
 
-    /** ****************************************************************
+    /**
+     * ***************************************************************
      * Method; InitRecord() is used to create and initialize the
      * tables used by the Hardware Store application. The parameters
      * passed are:
      * 1- String fileDat: is the name of the file to be created and
-     *    initialized.
+     * initialized.
      * 2- String FileRecord[][]: is the two dimensional array that contains
-     *    the initial data.
+     * the initial data.
      * 3- int loopCtl: is the number of entries in the array.
-     *
+     * <p>
      * Called by the HardwareStore() constructor
      ******************************************************************/
     public void InitRecord(String fileDat, String FileRecord[][],
@@ -663,7 +666,7 @@ public class HardwareStore extends JFrame
 
                 sysPrint("initTire(): 1b - " + aFile + " does not exist.");
 
-                file = new RandomAccessFile(aFile, "rw");
+                dataReadFile = new RandomAccessFile(aFile, "rw");
                 data = new Record();
 
                 for (int ii = 0; ii < loopCtl; ii++) {
@@ -679,16 +682,16 @@ public class HardwareStore extends JFrame
                     data.setCost(FileRecord[ii][6]);
 
                     sysPrint("initTire(): 1d - Calling Record method write() during initialization. " + ii);
-                    file.seek(ii * Record.getSize());
-                    data.write(file);
+                    dataReadFile.seek(ii * Record.getSize());
+                    data.write(dataReadFile);
 
                 }
             } else {
                 sysPrint("initTire(): 1e - " + fileDat + " exists.");
-                file = new RandomAccessFile(aFile, "rw");
+                dataReadFile = new RandomAccessFile(aFile, "rw");
             }
 
-            file.close();
+            dataReadFile.close();
         } catch (IOException e) {
             System.err.println("InitRecord() " + e.toString() +
                     " " + aFile);
@@ -696,15 +699,16 @@ public class HardwareStore extends JFrame
         }
     }
 
-    /** *************************************************************
+    /**
+     * ************************************************************
      * Method: display() is used to display the contents of the
-     *         specified table in the passed parameter. This method
-     *         uses the passed parameter to determine
-     *         1- Which table to display
-     *         2- Whether the table exists
-     *         3- If it exists, the table is opened and its
-     *            contents are displayed in a JTable.
-     *
+     * specified table in the passed parameter. This method
+     * uses the passed parameter to determine
+     * 1- Which table to display
+     * 2- Whether the table exists
+     * 3- If it exists, the table is opened and its
+     * contents are displayed in a JTable.
+     * <p>
      * Called from the actionPerformed() method of the MenuHandler class
      *********************************************************************/
     public void display(String str) {
@@ -712,45 +716,45 @@ public class HardwareStore extends JFrame
         String df = null, title = null;
 
         if (str.equals("Lawn Mowers")) {
-            df = new String("lawnmower.dat");
+            df = "lawnmower.dat";
             aFile = new File("lawnmower.dat");
-            title = new String("Hardware Store: Lawn Mowers");
+            title = "Hardware Store: Lawn Mowers";
         } else if (str.equals("Lawn Tractor Mowers")) {
-            df = new String("lawnTractor.dat");
+            df = "lawnTractor.dat";
             aFile = new File("lawnTractor.dat");
-            title = new String("Hardware Store: Lawn Tractor Mowers");
+            title = "Hardware Store: Lawn Tractor Mowers";
         } else if (str.equals("Hand Drill Tools")) {
-            df = new String("handDrill.dat");
+            df = "handDrill.dat";
             aFile = new File("handDrill.dat");
-            title = new String("Hardware Store:  Hand Drill Tools");
+            title = "Hardware Store:  Hand Drill Tools";
         } else if (str.equals("Drill Press Power Tools")) {
-            df = new String("drillPress.dat");
+            df = "drillPress.dat";
             aFile = new File("drillPress.dat");
-            title = new String("Hardware Store: Drill Press Power Tools");
+            title = "Hardware Store: Drill Press Power Tools";
         } else if (str.equals("Circular Saws")) {
-            df = new String("circularSaw.dat");
+            df = "circularSaw.dat";
             aFile = new File("circularSaw.dat");
-            title = new String("Hardware Store: Circular Saws");
+            title = "Hardware Store: Circular Saws";
         } else if (str.equals("Hammers")) {
-            df = new String("hammer.dat");
+            df = "hammer.dat";
             aFile = new File("hammer.dat");
-            title = new String("Hardware Store: Hammers");
+            title = "Hardware Store: Hammers";
         } else if (str.equals("Table Saws")) {
-            df = new String("tableSaw.dat");
+            df = "tableSaw.dat";
             aFile = new File("tableSaw.dat");
-            title = new String("Hardware Store: Table Saws");
+            title = "Hardware Store: Table Saws";
         } else if (str.equals("Band Saws")) {
-            df = new String("bandSaw.dat");
+            df = "bandSaw.dat";
             aFile = new File("bandSaw.dat");
-            title = new String("Hardware Store: Band Saws");
+            title = "Hardware Store: Band Saws";
         } else if (str.equals("Sanders")) {
-            df = new String("sanders.dat");
+            df = "sanders.dat";
             aFile = new File("sanders.dat");
-            title = new String("Hardware Store: Sanders");
+            title = "Hardware Store: Sanders";
         } else if (str.equals("Staplers")) {
-            df = new String("stapler.dat");
+            df = "stapler.dat";
             aFile = new File("stapler.dat");
-            title = new String("Hardware Store: Staplers");
+            title = "Hardware Store: Staplers";
         }
 
         try {
@@ -765,14 +769,14 @@ public class HardwareStore extends JFrame
                 sysPrint("display(): 1b - " + df + " does not exist.");
 
             } else {
-                file = new RandomAccessFile(df, "rw");
+                dataReadFile = new RandomAccessFile(df, "rw");
 
                 this.setTitle(title);
 
-                Redisplay(file, pData);
+                Redisplay(dataReadFile, pData);
             }
 
-            file.close();
+            dataReadFile.close();
         } catch (IOException e) {
             System.err.println(e.toString());
             System.err.println("Failed in opening " + df);
@@ -781,10 +785,11 @@ public class HardwareStore extends JFrame
 
     }
 
-    /** ********************************************************
+    /**
+     * *******************************************************
      * Method: Redisplay() is used to redisplay/repopualte the
-     *         JTable.
-     *
+     * JTable.
+     * <p>
      * Called from the
      * 1- display() method
      * 2- actionPerformed() method of the UpdateRecord class
@@ -813,11 +818,11 @@ public class HardwareStore extends JFrame
         c.validate();
     }
 
-    /** *******************************************************************
-     *  Method: actionPerformed() - This is the event handler that responds
-     *  to the the cancel button  on the main frame.
-     *
-     * *********************************************************************/
+    /**
+     * ******************************************************************
+     * Method: actionPerformed() - This is the event handler that responds
+     * to the the cancel button  on the main frame.
+     *********************************************************************/
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == refresh) {
@@ -830,15 +835,16 @@ public class HardwareStore extends JFrame
             cleanup();
     }
 
-    /** ****************************************************************
-     *  Method: cleanup() -This is the cleanup method that is used to close
-     *  the hardware.dat file and exit the application.
-     *
-     *  Called from the actionPerformed() method
+    /**
+     * ***************************************************************
+     * Method: cleanup() -This is the cleanup method that is used to close
+     * the hardware.dat file and exit the application.
+     * <p>
+     * Called from the actionPerformed() method
      *********************************************************************/
     public void cleanup() {
         try {
-            file.close();
+            dataReadFile.close();
         } catch (IOException e) {
             System.exit(1);
         }
@@ -847,9 +853,10 @@ public class HardwareStore extends JFrame
         System.exit(0);
     }
 
-    /** ***************************************************************
-     *  Method: displayDeleteDialog()
-     *
+    /**
+     * **************************************************************
+     * Method: displayDeleteDialog()
+     * <p>
      * Called from the actionPerformed() method of the PassWord class
      ******************************************************************/
     public void displayDeleteDialog() {
@@ -857,9 +864,10 @@ public class HardwareStore extends JFrame
         deleteRecordDialogBox.setVisible(true);
     }
 
-    /** ********************************************************
-     *  Method: displayUpdateDialog()
-     *
+    /**
+     * *******************************************************
+     * Method: displayUpdateDialog()
+     * <p>
      * Called from the actionPerformed() method of the PassWord class
      ******************************************************************/
     public void displayUpdateDialog() {
@@ -867,42 +875,46 @@ public class HardwareStore extends JFrame
         JOptionPane.showMessageDialog(null,
                 "Enter the record ID to be updated and press enter.",
                 "Update Record", JOptionPane.INFORMATION_MESSAGE);
-        updateRecordDialogBox = new UpdateRecord(hws, file, pData, -1);
+        updateRecordDialogBox = new UpdateRecord(hws, dataReadFile, pData, -1);
         updateRecordDialogBox.setVisible(true);
     }
 
-   /** ********************************************************
-    *  Method: displayAddDialog()
-    *
-    * Called from the actionPerformed() method of the PassWord class
-    ******************************************************************/
-   public void displayAddDialog() {
-      sysPrint ("The New/Add Record Dialog was made visible.\n") ;
-      NewRecord newRecordDialogBox = new NewRecord( hws, file, table, pData );
-      newRecordDialogBox.setVisible( true );
-   }
+    /**
+     * *******************************************************
+     * Method: displayAddDialog()
+     * <p>
+     * Called from the actionPerformed() method of the PassWord class
+     ******************************************************************/
+    public void displayAddDialog() {
+        sysPrint("The New/Add Record Dialog was made visible.\n");
+        NewRecord newRecordDialogBox = new NewRecord(hws, dataReadFile, table, pData);
+        newRecordDialogBox.setVisible(true);
+    }
 
-    /** ********************************************************
-     *  Method: setEntries() is called to set the number of current
-     *          entries in the pData array.
+    /**
+     * *******************************************************
+     * Method: setEntries() is called to set the number of current
+     * entries in the pData array.
      ********************************************************/
     public void setEntries(int ent) {
         numEntries = ent;
     }
 
-    /** ********************************************************
-     *  Method: getPData() returns a specific row and column
-     *
-     *  This method is no longer used
+    /**
+     * *******************************************************
+     * Method: getPData() returns a specific row and column
+     * <p>
+     * This method is no longer used
      ********************************************************/
     public String getPData(int ii, int iii) {
         return pData[ii][iii];
     }
 
-    /** ********************************************************
-     *  Method: getEntries() returns the number of current entries
-     *          in the pData array.
-     *
+    /**
+     * *******************************************************
+     * Method: getEntries() returns the number of current entries
+     * in the pData array.
+     * <p>
      * Called from
      * 1- actionPerformed() method of the NewRec class
      * 2- actionPerformed() method of the DeleteRec class
@@ -911,27 +923,30 @@ public class HardwareStore extends JFrame
         return numEntries;
     }
 
-    /** ********************************************************
-     *  Method: sysPrint() is a debugging aid that is used to print
-     *          information to the screen.
+    /**
+     * *******************************************************
+     * Method: sysPrint() is a debugging aid that is used to print
+     * information to the screen.
      ********************************************************/
     public void sysPrint(String str) {
-        if (myDebug) {
+        if (toggleDebug) {
             System.out.println(str);
         }
     }
 
-    /** ****************************************************************
+    /**
+     * ***************************************************************
      * Method: toArray(RandomAccessFile lFile, String a[][])
-     *
+     * <p>
      * Purpose: Returns an array containing all of the
-     *          elements in this list in the correct
-     *          order.
-     *
+     * elements in this list in the correct
+     * order.
+     * <p>
      * Called from the
      * 1- Setup method of the HardwareStore class
      * 2- Redisplay() method
-     ****************************************************************** */
+     * *****************************************************************
+     */
     public int toArray(RandomAccessFile file, String a[][]) {
 
         Record NodeRef = new Record(),
@@ -1006,9 +1021,10 @@ public class HardwareStore extends JFrame
         hwstore.hws = hwstore;
     }
 
-    /** ********************************************************
-     *  Class: The purpose of the MenuHandler class is to respond
-     *         to the events generated by the menu items.
+    /**
+     * *******************************************************
+     * Class: The purpose of the MenuHandler class is to respond
+     * to the events generated by the menu items.
      ********************************************************/
     public class MenuHandler implements ActionListener {
         public void actionPerformed(ActionEvent e) {
@@ -1055,46 +1071,35 @@ public class HardwareStore extends JFrame
             } else if (e.getSource() == stapMI) {
                 sysPrint("The Staplers menu Item was selected.\n");
 
-            display( "Staplers" ) ;
-         }
-         else if ( e.getSource() == wdvMI ) {
-            sysPrint ("The Wet-Dry Vacs menu Item was selected.\n" );
-           // ListRecs BPTRecs = new ListRecs( hws , "WDV", "Wet-Dry Vacs" );
-         }
-         else if ( e.getSource() == sccMI ) {
-            sysPrint ("The Storage, Chests & Cabinets menu Item was selected.\n" );
-            //ListRecs BPTRecs = new ListRecs( hws , "SCC", "Storage, Chests & Cabinets" );
-         }
-         else if ( e.getSource() == deleteMenuItem ) {
-            sysPrint ("The Delete Record Dialog was made visible.\n") ;
-            //DeleteRec( HardwareStore hw_store,  RandomAccessFile f,
-                  // JTable tab, String p_Data[] []  )
-            deleteRecordDialogBox = new DeleteRecord( hws, file, table, pData );
-            deleteRecordDialogBox.setVisible( true );
-         }
-         else if ( e.getSource() == addMenuItem ) {
-            sysPrint ("The Add menu Item was selected.\n" );
-            passwordCheckingDialogBox.displayDialog( "add" ) ;
-         }
-         else if ( e.getSource() == updateMenuItem ) {
-            sysPrint ("The Update menu Item was selected.\n" );
-            updateRecordDialogBox = new UpdateRecord( hws, file,  pData, -1 );
-            updateRecordDialogBox.setVisible( true );
-         }
-         else if ( e.getSource() == listAllMenuItem ) {
-            sysPrint ("The List All menu Item was selected.\n" );
-         }
-         else if ( e.getSource() == debugON ) {
-            myDebug = true ;
-            sysPrint ("Debugging for this execution is turned on.\n" );
-         }
-         else if ( e.getSource() == debugOFF ) {
-            sysPrint ("Debugging for this execution is turned off.\n" );
-            myDebug = false ;
-         }
-         else if ( e.getSource() == helpHWMenuItem ) {
-            sysPrint ("The Help menu Item was selected.\n" );
-            File hd = new File("HW_Tutorial.html");
+                display("Staplers");
+            } else if (e.getSource() == wdvMI) {
+                sysPrint("The Wet-Dry Vacs menu Item was selected.\n");
+                // ListRecs BPTRecs = new ListRecs( hws , "WDV", "Wet-Dry Vacs" );
+            } else if (e.getSource() == sccMI) {
+                sysPrint("The Storage, Chests & Cabinets menu Item was selected.\n");
+                //ListRecs BPTRecs = new ListRecs( hws , "SCC", "Storage, Chests & Cabinets" );
+            } else if (e.getSource() == deleteMenuItem) {
+                sysPrint("The Delete Record Dialog was made visible.\n");
+                deleteRecordDialogBox = new DeleteRecord(hws, dataReadFile, table, pData);
+                deleteRecordDialogBox.setVisible(true);
+            } else if (e.getSource() == addMenuItem) {
+                sysPrint("The Add menu Item was selected.\n");
+                passwordCheckingDialogBox.displayDialog("add");
+            } else if (e.getSource() == updateMenuItem) {
+                sysPrint("The Update menu Item was selected.\n");
+                updateRecordDialogBox = new UpdateRecord(hws, dataReadFile, pData, -1);
+                updateRecordDialogBox.setVisible(true);
+            } else if (e.getSource() == listAllMenuItem) {
+                sysPrint("The List All menu Item was selected.\n");
+            } else if (e.getSource() == debugON) {
+                toggleDebug = true;
+                sysPrint("Debugging for this execution is turned on.\n");
+            } else if (e.getSource() == debugOFF) {
+                sysPrint("Debugging for this execution is turned off.\n");
+                toggleDebug = false;
+            } else if (e.getSource() == helpHWMenuItem) {
+                sysPrint("The Help menu Item was selected.\n");
+                File hd = new File("HW_Tutorial.html");
 
                 Runtime rt = Runtime.getRuntime();
                 String[] callAndArgs = {"c:\\Program Files\\Internet Explorer\\IEXPLORE.exe",
@@ -1134,13 +1139,10 @@ public class HardwareStore extends JFrame
             String current = (String) e.getActionCommand();
         }
     }
-    
+
     public File getaFile() {
         return aFile;
     }
 
-    public void setaFile(File aFile) {
-        this.aFile = aFile;
-    }
 }
 
